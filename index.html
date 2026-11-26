@@ -6,42 +6,95 @@
     <meta name="color-scheme" content="light dark">
     <title>Meu Site</title>
     <style>
-        /* Cores do modo CLARO (padrão) */
+        /* ===== MODO CLARO ===== */
         :root {
-            --fundo: #ffffff;
             --texto: #333333;
             --titulo: #111111;
+            --grad1: #e0f2ff;
+            --grad2: #ffe7f0;
+            --grad3: #e8fff1;
+            --grad4: #fff7e0;
+            --card-bg: rgba(255, 255, 255, 0.65);
+            --card-border: rgba(0, 0, 0, 0.06);
         }
 
-        /* Cores do modo ESCURO */
+        /* ===== MODO ESCURO ===== */
         @media (prefers-color-scheme: dark) {
             :root {
-                --fundo: #121212;
                 --texto: #dddddd;
                 --titulo: #ffffff;
+                --grad1: #0f1b2e;
+                --grad2: #241a33;
+                --grad3: #0a2a1f;
+                --grad4: #2b1a1a;
+                --card-bg: rgba(30, 30, 30, 0.6);
+                --card-border: rgba(255, 255, 255, 0.08);
             }
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, sans-serif;
-            background: var(--fundo);
-            color: var(--texto);
-            text-align: center;
-            padding: 20px;
             margin: 0;
-            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: -apple-system, sans-serif;
+            color: var(--texto);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* ===== FUNDO ANIMADO ===== */
+            background: linear-gradient(-45deg,
+                var(--grad1),
+                var(--grad2),
+                var(--grad3),
+                var(--grad4));
+            background-size: 400% 400%;
+            animation: gradiente 18s ease infinite;
         }
+
+        @keyframes gradiente {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Acessibilidade: quem desativa animações por preferência */
+        @media (prefers-reduced-motion: reduce) {
+            body { animation: none; }
+        }
+
+        /* ===== CARTÃO (pra manter o texto legível) ===== */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 28px 20px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
         img {
-            max-width: 90%;
-            border-radius: 12px;
-            margin: 20px 0;
+            max-width: 100%;
+            border-radius: 16px;
+            margin: 16px auto;
+            display: block;
         }
-        h1 { color: var(--titulo); }
+
+        h1 { color: var(--titulo); margin: 0 0 8px; }
+        p  { margin: 8px 0 0; }
     </style>
 </head>
 <body>
-    <h1>Olá, eu sou [Marcos]</h1>
-    <img src="foto.png" alt="Minha foto">
-    <p>Bem-vindo ao meu primeiro site!</p>
+    <div class="card">
+        <h1>Olá, eu sou Marcos</h1>
+        <img src="foto.png" alt="Minha foto">
+        <p>Bem-vindo ao meu primeiro site!</p>
+    </div>
 </body>
 </html>
