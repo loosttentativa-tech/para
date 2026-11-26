@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light dark">
+    <title>Jogo da Velha</title>
+    <style>
+        :root { --bg1:#f5f5f5; --bg2:#e3f2fd; --texto:#333; --titulo:#111; --cel:#fff; --linha:#ddd; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg1:#121212; --bg2:#1a1a2e; --texto:#ddd; --titulo:#fff; --cel:#1e1e32; --linha:#333; }
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, sans-serif;
+            margin: 0; min-height: 100vh;
+            background: linear-gradient(160deg, var(--bg1), var(--bg2));
+            color: var(--texto); text-align: center;
+            padding: 20px 16px;
+        }
+        h1 { color: var(--titulo); font-size: 1.5rem; margin: 8px 0; }
+        #status { min-height: 28px; margin-bottom: 16px; font-weight: 600; }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 320px;
+            margin: 0 auto 20px;
+        }
+        .cell {
+            aspect-ratio: 1;
+            background: var(--cel);
+            border: none;
+            border-radius: 14px;
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--titulo);
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
+        }
+        .cell.x { color: #7c4dff; }
+        .cell.o { color: #00bcd4; }
+        .cell:disabled { opacity: 1; }
+        .botoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        button.acao, a.acao {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #7c4dff, #00e5ff);
+        }
+        a.acao { background: transparent; color: var(--texto); box-shadow: none; }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Velha</h1>
+    <div id="status">Vez do X</div>
+    <div class="board" id="board"></div>
+    <div class="botoes">
+        <button class="acao" id="reset">Jogar de novo</button>
+        <a class="acao" href="jogos.html">← Voltar</a>
+    </div>
+    <script>
+        const boardEl = document.getElementById('board');
+        const statusEl = document.getElementById('status');
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        let board, vez, fim;
 
+        function iniciar() {
+            board = Array(9).fill('');
+            vez = 'X';
+            fim = false;
+            statusEl.textContent = 'Vez do X';
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const b = document.createElement('button');
+                b.className = 'cell';
+                b.addEventListener('click', () => jogar(i, b));
+                boardEl.appendChild(b);
+            }
+        }
+
+        function jogar(i, btn) {
+            if (board[i] || fim) return;
+            board[i] = vez;
+            btn.textContent = vez;
+            btn.classList.add(vez.toLowerCase());
+            btn.disabled = true;
+            if (ganhou(vez)) {
+                statusEl.textContent = vez + ' venceu!';
+                fim = true;
+                return;
+            }
+            if (board.every(v => v)) {
+                statusEl.textContent = 'Empate!';
+                fim = true;
+                return;
+            }
+            vez = vez === 'X' ? 'O' : 'X';
+            statusEl.textContent = 'Vez do ' + vez;
+        }
+
+        function ganhou(j) {
+            return wins.some(l => l.every(i => board[i] === j));
+        }
+
+        document.getElementById('reset').onclick = iniciar;
+        iniciar();
+    </script>
+</body>
+</html>
