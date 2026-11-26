@@ -51,4 +51,251 @@
         .cell {
             aspect-ratio: 1; background: var(--cel); border: none;
             border-radius: 14px; font-size: 2.5rem; font-weight: 800;
-            color: var(--titulo); box-shadow: 0 4px 
+            color: var(--titulo); box-shadow: 0 4px 12px rgba(0,0,0,.12);
+        }
+        .cell.x { color: #7c4dff; }
+        .cell.o { color: #00bcd4; }
+        .cell.win { background: #7c4dff; color: #fff !important; }
+        .cell:disabled { opacity: 1; }
+        .botoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        button.acao, a.acao {
+            padding: 12px 22px; border: none; border-radius: 50px;
+            font-size: 1rem; font-weight: 700; text-decoration: none;
+            color: #fff; background: linear-gradient(135deg, #7c4dff, #00e5ff);
+        }
+        a.acao { background: transparent; color: var(--texto); }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Velha</h1>
+    <div class="placar">Você <b id="ptsEu">0</b> <span>×</span> <b id="ptsPc">0</b> Máquina</div>
+    <div class="niveis">
+        <button data-n="facil">Fácil</button>
+        <button data-n="dificil" class="sel">Difícil</button>
+        <button data-n="impossivel">Impossível</button>
+    </div>
+    <div id="status">Sua vez</div>
+    <div class="board" id="board"></div>
+    <div class="botoes">
+        <button class="acao" id="reset">Nova partida</button>
+        <a class="acao" href="jogos.html">← Voltar</a>
+    </div>
+
+    <script>
+        const HUMANO = 'X', MAQUINA = 'O';
+        const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        const boardEl = document.getElementById('board');
+        const statusEl = document.getElementById('status');
+
+        let board, cells, vez, fim, travado;
+        let nivel = 'dificil';
+        let ptsEu = 0, ptsPc = 0;
+        let quemComeca = HUMANO;
+        let timerProx = null;
+
+        document.querySelectorAll('.niveis button').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.niveis button').forEach(b => b.classList.remove('sel'));
+                btn.classList.add('sel');
+                nivel = btn.dataset.n;
+                iniciarRodada();
+            };
+        });
+
+        document.getElementById('reset').onclick = novaPartida;
+
+        function novaPartida() {
+            ptsEu = 0; ptsPc = 0;
+            quemComeca = HUMANO;
+            atualizarPlacar();
+            iniciarRodada();
+        }
+
+        function iniciarRodada() {
+            clearTimeout(timerProx);
+            board = Array(9).fill('');
+            vez = quemComeca;
+            fim = false;
+            travado = false;
+            cells = [];
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const b = document.createElement('button');
+                b.className = 'cell';
+                b.addEventListener('click', () => clique(i));
+                boardEl.appendChild(b);
+                cells.push(b);
+            }
+            statusEl.textContent = vez === HUMANO ? 'Sua vez' : 'A máquina pensa...';
+            if (vez === MAQUINA) {
+                travado = true;
+                setTimeout(jogadaMaquina, 500);
+            }
+        }
+
+        function clique(i) {
+            if (travado || fim || board[i] || vez !== HUMANO) return;
+            aplicar(i, HUMANO);
+            if (fim) return;
+            vez = MAQUINA;
+            travado = true;
+            statusEl.textContent = 'A máquina pensa...';
+            setTimeout(jogadaMaquina, 450 + Math.random() * 350);
+        }
+
+        function aplicar(i, jog) {
+            board[i] = jog;
+            cells[i].textContent = jog;
+            cells[i].classList.add(jog.toLowerCase());
+            cells[i].disabled = true;
+
+            const linha = linhaVencedora(jog);
+            if (linha) {
+                linha.forEach(k => cells[k].classList.add('win'));
+                encerrar(jog);
+                return;
+            }
+            if (board.every(v => v)) encerrar(null);
+        }
+
+        function encerrar(vencedor) {
+            fim = true;
+            travado = true;
+            if (vencedor === HUMANO) {
+                ptsEu++;
+                quemComeca = HUMANO;
+                statusEl.textContent = 'Você venceu a rodada!';
+            } else if (vencedor === MAQUINA) {
+                ptsPc++;
+                quemComeca = MAQUINA;
+                statusEl.textContent = 'A máquina venceu a rodada!';
+            } else {
+                quemComeca = (quemComeca === HUMANO) ? MAQUINA : HUMANO;
+                statusEl.textContent = 'Empate!';
+            }
+            atualizarPlacar();
+
+            if (ptsEu >= 3 || ptsPc >= 3) {
+                statusEl.textContent = ptsEu >= 3
+                    ? 'Você ganhou a partida! 🎉'
+                    : 'A máquina ganhou a partida';
+                timerProx = setTimeout(() => {
+                    ptsEu = 0; ptsPc = 0;
+                    quemComeca = HUMANO;
+                    atualizarPlacar();
+                    iniciarRodada();
+                }, 2200);
+                return;
+            }
+            timerProx = setTimeout(iniciarRodada, 1300);
+        }
+
+        function atualizarPlacar() {
+            document.getElementById('ptsEu').textContent = ptsEu;
+            document.getElementById('ptsPc').textContent = ptsPc;
+        }
+
+        function vazias() {
+            return board.map((v, i) => v ? null : i).filter(v => v !== null);
+        }
+
+        function ganhouBoard(b, j) {
+            return WINS.some(l => l.every(i => b[i] === j));
+        }
+
+        function linhaVencedora(j) {
+            return WINS.find(l => l.every(i => board[i] === j)) || null;
+        }
+
+        function jogadaMaquina() {
+            if (fim) return;
+            const i = escolherJogada();
+            aplicar(i, MAQUINA);
+            if (fim) return;
+            vez = HUMANO;
+            travado = false;
+            statusEl.textContent = 'Sua vez';
+        }
+
+        function escolherJogada() {
+            if (nivel === 'facil') return jogadaFacil();
+            if (nivel === 'dificil') return jogadaDificil();
+            return jogadaImpossivel();
+        }
+
+        function jogadaFacil() {
+            const livres = vazias();
+            if (Math.random() < 0.25) {
+                const win = acharJogada(MAQUINA);
+                if (win !== null) return win;
+            }
+            return livres[Math.floor(Math.random() * livres.length)];
+        }
+
+        function jogadaDificil() {
+            let i = acharJogada(MAQUINA);
+            if (i !== null) return i;
+            i = acharJogada(HUMANO);
+            if (i !== null) return i;
+            if (!board[4]) return 4;
+            const cantos = [0, 2, 6, 8].filter(k => !board[k]);
+            if (cantos.length) return cantos[Math.floor(Math.random() * cantos.length)];
+            const livres = vazias();
+            return livres[Math.floor(Math.random() * livres.length)];
+        }
+
+        function acharJogada(j) {
+            for (const i of vazias()) {
+                board[i] = j;
+                const ok = ganhouBoard(board, j);
+                board[i] = '';
+                if (ok) return i;
+            }
+            return null;
+        }
+
+        function jogadaImpossivel() {
+            let melhor = -Infinity, escolhas = [];
+            for (const i of vazias()) {
+                board[i] = MAQUINA;
+                const nota = minimax(board, 0, false, -Infinity, Infinity);
+                board[i] = '';
+                if (nota > melhor) { melhor = nota; escolhas = [i]; }
+                else if (nota === melhor) escolhas.push(i);
+            }
+            return escolhas[Math.floor(Math.random() * escolhas.length)];
+        }
+
+        function minimax(b, depth, isMax, alpha, beta) {
+            if (ganhouBoard(b, MAQUINA)) return 10 - depth;
+            if (ganhouBoard(b, HUMANO)) return depth - 10;
+            if (b.every(v => v)) return 0;
+
+            if (isMax) {
+                let best = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (b[i]) continue;
+                    b[i] = MAQUINA;
+                    best = Math.max(best, minimax(b, depth + 1, false, alpha, beta));
+                    b[i] = '';
+                    alpha = Math.max(alpha, best);
+                    if (beta <= alpha) break;
+                }
+                return best;
+            }
+            let best = Infinity;
+            for (let i = 0; i < 9; i++) {
+                if (b[i]) continue;
+                b[i] = HUMANO;
+                best = Math.min(best, minimax(b, depth + 1, true, alpha, beta));
+                b[i] = '';
+                beta = Math.min(beta, best);
+                if (beta <= alpha) break;
+            }
+            return best;
+        }
+
+        iniciarRodada();
+    </script>
+</body>
+</html>
