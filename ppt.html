@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light dark">
+    <title>Pedra, Papel e Tesoura</title>
+    <style>
+        :root { --bg1:#f5f5f5; --bg2:#e3f2fd; --texto:#333; --titulo:#111; --card:#fff; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg1:#121212; --bg2:#1a1a2e; --texto:#ddd; --titulo:#fff; --card:#1e1e32; }
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, sans-serif;
+            margin: 0; min-height: 100vh;
+            background: linear-gradient(160deg, var(--bg1), var(--bg2));
+            color: var(--texto); text-align: center;
+            padding: 20px 16px;
+        }
+        h1 { color: var(--titulo); font-size: 1.4rem; }
+        .placar { font-size: 1.1rem; margin: 8px 0 20px; }
+        .escolhas { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+        .escolhas button {
+            width: 88px; height: 88px; font-size: 2.4rem;
+            border: none; border-radius: 20px;
+            background: var(--card);
+            box-shadow: 0 4px 14px rgba(0,0,0,.15);
+        }
+        .escolhas button:active { transform: scale(.94); }
+        #resultado { min-height: 90px; font-size: 1.15rem; font-weight: 600; }
+        .vs { font-size: 2rem; margin: 8px 0; }
+        a.voltar { display: inline-block; margin-top: 28px; color: var(--texto); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>Pedra, Papel e Tesoura</h1>
+    <div class="placar">Você <b id="eu">0</b> × <b id="pc">0</b> Celular</div>
+    <div class="escolhas">
+        <button data-j="pedra">✊</button>
+        <button data-j="papel">✋</button>
+        <button data-j="tesoura">✌️</button>
+    </div>
+    <div id="resultado">Escolha uma opção</div>
+    <a class="voltar" href="jogos.html">← Voltar</a>
+    <script>
+        const ops = ['pedra', 'papel', 'tesoura'];
+        const emoji = { pedra: '✊', papel: '✋', tesoura: '✌️' };
+        let eu = 0, pc = 0;
+        const res = document.getElementById('resultado');
+
+        document.querySelectorAll('.escolhas button').forEach(btn => {
+            btn.onclick = () => {
+                const jogador = btn.dataset.j;
+                const cpu = ops[Math.floor(Math.random() * 3)];
+                let texto, ponto;
+                if (jogador === cpu) {
+                    texto = 'Empate!';
+                } else if (
+                    (jogador === 'pedra' && cpu === 'tesoura') ||
+                    (jogador === 'papel' && cpu === 'pedra') ||
+                    (jogador === 'tesoura' && cpu === 'papel')
+                ) {
+            
+                texto = 'Você ganhou!';
+                    eu++;
+                } else {
+                    texto = 'Você perdeu!';
+                    pc++;
+                }
+                document.getElementById('eu').textContent = eu;
+                document.getElementById('pc').textContent = pc;
+                res.innerHTML = `Você ${emoji[jogador]} <div class="vs">vs</div> ${emoji[cpu]} Celular<br>${texto}`;
+            };
+        });
+    </script>
+</body>
+</html>
