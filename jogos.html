@@ -1,1 +1,110 @@
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Jogos</title>
+    <style>
+        :root {
+            --cor1: #ffffff; --cor2: #e3f2fd; --cor3: #fce4ec; --cor4: #f3e5f5;
+            --texto: #333; --titulo: #111; --particula: #b388ff; --card: rgba(255,255,255,.7);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --cor1: #121212; --cor2: #1a1a2e; --cor3: #16213e; --cor4: #0f3460;
+                --texto: #ddd; --titulo: #fff; --particula: #fff; --card: rgba(255,255,255,.08);
+            }
+        }
+        body {
+            font-family: -apple-system, sans-serif;
+            color: var(--texto);
+            text-align: center;
+            padding: 24px 16px 80px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        body::before {
+            content: "";
+            position: fixed; inset: 0; z-index: -2;
+            background: linear-gradient(-45deg, var(--cor1), var(--cor2), var(--cor3), var(--cor4));
+            background-size: 400% 400%;
+            animation: mover 15s ease infinite;
+        }
+        @keyframes mover {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .particulas { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .particulas span {
+            position: absolute; bottom: -10px; border-radius: 50%;
+            background: var(--particula);
+            box-shadow: 0 0 6px var(--particula), 0 0 12px var(--particula);
+            animation-name: flutuar, piscar;
+            animation-timing-function: linear, ease-in-out;
+            animation-iteration-count: infinite;
+        }
+        @keyframes flutuar {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(var(--x), -27vh); }
+            50% { transform: translate(0, -55vh); }
+            75% { transform: translate(calc(var(--x) * -1), -82vh); }
+            100% { transform: translate(0, -110vh); }
+        }
+        @keyframes piscar { 0%,100% { opacity:.2; } 50% { opacity:1; } }
+        @media (prefers-reduced-motion: reduce) {
+            body::before { animation: none; }
+            .particulas { display: none; }
+        }
+        h1 { color: var(--titulo); margin: 8px 0 6px; }
+        p { margin-bottom: 28px; }
+        .lista { display: flex; flex-direction: column; gap: 14px; max-width: 360px; margin: 0 auto; }
+        a.jogo {
+            display: block;
+            padding: 20px;
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            text-decoration: none;
+            color: var(--titulo);
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 6px 20px rgba(0,0,0,.15);
+        }
+        a.jogo span { display: block; font-size: .85rem; font-weight: 400; color: var(--texto); margin-top: 4px; }
+        .voltar {
+            display: inline-block;
+            margin-top: 28px;
+            color: var(--texto);
+            text-decoration: none;
+            font-size: .95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="particulas"></div>
+    <h1>Jogos</h1>
+    <p>Escolha um pra jogar</p>
+    <div class="lista">
+        <a class="jogo" href="velha.html">Jogo da Velha<span>2 jogadores no mesmo celular</span></a>
+        <a class="jogo" href="ppt.html">Pedra, Papel e Tesoura<span>Você contra o celular</span></a>
+    </div>
+    <a class="voltar" href="index.html">← Voltar</a>
+    <script>
+        const c = document.querySelector('.particulas');
+        for (let i = 0; i < 40; i++) {
+            const p = document.createElement('span');
+            const t = Math.random() * 4 + 2;
+            const s = Math.random() * 15 + 10;
+            const k = Math.random() * 2.5 + 1.5;
+            p.style.width = p.style.height = t + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.setProperty('--x', (Math.random() * 80 - 40) + 'px');
+            p.style.animationDuration = s + 's, ' + k + 's';
+            p.style.animationDelay = '-' + (Math.random() * s) + 's, -' + (Math.random() * k) + 's';
+            c.appendChild(p);
+        }
+    </script>
+</body>
+</html>
