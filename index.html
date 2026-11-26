@@ -6,7 +6,6 @@
     <meta name="color-scheme" content="light dark">
     <title>Meu Site</title>
     <style>
-        /* Cores do modo CLARO */
         :root {
             --cor1: #ffffff;
             --cor2: #e3f2fd;
@@ -17,7 +16,6 @@
             --particula: #b388ff;
         }
 
-        /* Cores do modo ESCURO */
         @media (prefers-color-scheme: dark) {
             :root {
                 --cor1: #121212;
@@ -39,7 +37,6 @@
             min-height: 100vh;
         }
 
-        /* Fundo com gradiente animado */
         body::before {
             content: "";
             position: fixed;
@@ -56,7 +53,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Camada das partículas */
         .particulas {
             position: fixed;
             inset: 0;
@@ -76,7 +72,6 @@
             animation-iteration-count: infinite, infinite;
         }
 
-        /* Sobe balançando para os lados */
         @keyframes flutuar {
             0%   { transform: translate(0, 0); }
             25%  { transform: translate(var(--x), -27vh); }
@@ -85,13 +80,11 @@
             100% { transform: translate(0, -110vh); }
         }
 
-        /* Pisca */
         @keyframes piscar {
             0%, 100% { opacity: 0.2; }
             50%      { opacity: 1; }
         }
 
-        /* Respeita o "Reduzir Movimento" do iPhone */
         @media (prefers-reduced-motion: reduce) {
             body::before { animation: none; }
             .particulas { display: none; }
@@ -101,10 +94,31 @@
             max-width: 90%;
             border-radius: 12px;
             margin: 20px 0;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         }
 
-        h1 { color: var(--titulo); }
+        h1 { color: var(--titulo); margin-bottom: 8px; }
+
+        p { margin-bottom: 32px; }
+
+        .btn-jogos {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #7c4dff, #00e5ff);
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-radius: 50px;
+            box-shadow: 0 6px 24px rgba(124, 77, 255, 0.45);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .btn-jogos:active {
+            transform: scale(0.96);
+            box-shadow: 0 3px 12px rgba(124, 77, 255, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -114,15 +128,17 @@
     <img src="foto.png" alt="Minha foto">
     <p>Bem-vindo ao meu primeiro site!</p>
 
+    <a href="jogos.html" class="btn-jogos">Jogos</a>
+
     <script>
         const container = document.querySelector('.particulas');
-        const quantidade = 40; // número de partículas
+        const quantidade = 40;
 
         for (let i = 0; i < quantidade; i++) {
             const p = document.createElement('span');
-            const tamanho = Math.random() * 4 + 2;          // 2px a 6px
-            const subida = Math.random() * 15 + 10;          // 10s a 25s
-            const pisca = Math.random() * 2.5 + 1.5;         // 1.5s a 4s
+            const tamanho = Math.random() * 4 + 2;
+            const subida = Math.random() * 15 + 10;
+            const pisca = Math.random() * 2.5 + 1.5;
 
             p.style.width = tamanho + 'px';
             p.style.height = tamanho + 'px';
